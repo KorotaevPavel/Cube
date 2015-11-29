@@ -4,6 +4,18 @@
 #define SCREEN_WIDTH 640
 #define SCREEN_HEIGHT 480
 
+uint32_t getPixel(SDL_Surface *surface, int x, int y)
+{
+	uint32_t *pixels = (uint32_t *)surface->pixels;
+	return pixels[(y * surface->w) + x];
+}
+
+void putPixel(SDL_Surface *surface, int x, int y, uint32_t pixel)
+{
+	uint32_t *pixels = (uint32_t *)surface->pixels;
+	pixels[(y * surface->w) + x] = pixel;
+}
+
 int main(int argc, char* argv[])
 {
 	SDL_Window *window;
@@ -13,7 +25,7 @@ int main(int argc, char* argv[])
 		SDL_WINDOWPOS_UNDEFINED,
 		SCREEN_WIDTH,
 		SCREEN_HEIGHT,
-		SDL_WINDOW_FULLSCREEN_DESKTOP
+		SDL_WINDOW_OPENGL
 		);
 	if (window == NULL)
 	{
@@ -22,18 +34,27 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	SDL_Surface *bmp;
-	bmp = SDL_LoadBMP("new_image.bmp");
-	if (bmp == NULL)
+	const int radius = 50;
+
+	SDL_Surface *createdBMP = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0, 0, 0, 0);
+	for (int x = 0; x < createdBMP->w; x++)
 	{
-		printf("Unable to load bmp: %s\n", SDL_GetError());
-		SDL_Delay(5000);
-		return 1;
+		for (int y = 0; y < createdBMP->h; y++)
+		{
+			const bool isInside = (((createdBMP->h / 4 - x)*(createdBMP->h / 4 - x) + (createdBMP->w / 4 - y)*(createdBMP->w / 4 - y)) <= radius*radius);
+			if (isInside)
+			{
+				putPixel(createdBMP, x, y, 0x00ff0000);
+			}
+			else
+			{
+				putPixel(createdBMP, x, y, 0);
+			}
+		}
 	}
 
-	SDL_BlitSurface(bmp, NULL, SDL_GetWindowSurface(window), NULL);
+	SDL_BlitSurface(createdBMP, NULL, SDL_GetWindowSurface(window), NULL);
 	SDL_UpdateWindowSurface(window);
-
 	SDL_Delay(5000);
 
 	SDL_DestroyWindow(window);
