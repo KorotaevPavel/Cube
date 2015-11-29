@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
 	{
 		for (int y = 0; y < createdBMP->h; y++)
 		{
-			const bool isInside = (((createdBMP->h / 4 - x)*(createdBMP->h / 4 - x) + (createdBMP->w / 4 - y)*(createdBMP->w / 4 - y)) <= radius*radius);
+			const bool isInside = (((createdBMP->w / 2 - x)*(createdBMP->w / 2 - x) + (createdBMP->h / 2 - y)*(createdBMP->h / 2 - y)) <= radius*radius);
 			if (isInside)
 			{
 				putPixel(createdBMP, x, y, 0x00ff0000);
